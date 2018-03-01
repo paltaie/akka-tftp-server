@@ -28,7 +28,6 @@ public class Server extends AbstractActor {
     public Receive createReceive() {
         return receiveBuilder()
                 .match(Udp.Bound.class, bound -> {
-                    System.out.println("BOUND!");
                     getContext().become(ready(getSender()));
                 })
                 .build();
