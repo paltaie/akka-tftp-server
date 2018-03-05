@@ -29,7 +29,7 @@ public class ReadRequestActor extends AbstractActor {
         ClientMap.map.entrySet().stream().filter(a -> a.getValue().equals(terminated.actor())).findFirst().ifPresent(a -> ClientMap.map.remove(a.getKey()));
     }
 
-    private void handleReceived(Udp.Received r) throws IOException {
+    private void handleReceived(Udp.Received r) {
         byte[] data = ArrayUtils.toPrimitive(JavaConversions.seqAsJavaList(r.data()).toArray(new Byte[0]));
         String filename = new String(Arrays.copyOfRange(data, indexOf(data, ZERO_BYTE, 1),  indexOf(data, ZERO_BYTE, 2)), StandardCharsets.UTF_8).trim();
         String mode = new String(Arrays.copyOfRange(data, indexOf(data, ZERO_BYTE, 2) + 1,  indexOf(data, ZERO_BYTE, 3)), StandardCharsets.UTF_8);

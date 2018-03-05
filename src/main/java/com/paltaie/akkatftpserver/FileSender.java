@@ -57,9 +57,11 @@ public class FileSender extends AbstractActor {
                 }
                 blocks.add(Arrays.copyOfRange(data, i*MAX_BLOCK_SIZE, (i*MAX_BLOCK_SIZE)+MAX_BLOCK_SIZE));
             }
-            ByteString response = ByteString.fromArray(new Data(1, data).getBytes());
-            System.out.println("sending " + response);
-            sender().tell(UdpMessage.send(ByteString.fromArray(new Data(1, data).getBytes()), senderSocket), self());
+            if (data.length % MAX_BLOCK_SIZE == 0) {
+                totalBlocks++;
+                blocks.add(new byte[]{});
+            }
+            sender().tell(UdpMessage.send(ByteString.fromArray(new Data(1, blocks.get(0)).getBytes()), senderSocket), self());
             getContext().become(awaitingAck());
         } catch (FileNotFoundException e) {
             Error error = new Error(1, "File not found: " + readRequest.getFilename());
@@ -87,7 +89,7 @@ public class FileSender extends AbstractActor {
         log.debug("Received an ACK for block " + ack.getBlockNumber() + "/" + totalBlocks + " for consumer " + senderSocket);
         if (lastAcked == totalBlocks) {
             log.debug("All blocks sent and acked. Stopping self.");
-            context().stop(self());
+//            context().stop(self());
         } else {
             ByteString response = ByteString.fromArray(new Data(lastAcked + 1, blocks.get(lastAcked)).getBytes());
             sender().tell(UdpMessage.send(response, senderSocket), self());
