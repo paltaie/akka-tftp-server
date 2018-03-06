@@ -88,7 +88,7 @@ public class FileSender extends AbstractActor {
     private void handleAck(Ack ack) {
         currentDataBlock++;
         currentBlockId = ack.getBlockNumber();
-        if (currentBlockId == 65535) { //Roll over to 1 when we reach 0b111111111111111
+        if (currentBlockId == 65535) { //Roll over to 1 when we reach 0b1111111111111111
             currentBlockId = 1;
         } else {
             currentBlockId++;
