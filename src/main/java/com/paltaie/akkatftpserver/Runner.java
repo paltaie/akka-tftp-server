@@ -5,7 +5,7 @@ import akka.actor.Props;
 import com.paltaie.akkatftpserver.model.ErrorActor;
 
 public class Runner {
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         // boot up server using the route as defined below
         ActorSystem system = ActorSystem.create("akka-tftp-server");
         system.actorOf(Props.create(Server.class,

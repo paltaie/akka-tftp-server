@@ -8,7 +8,6 @@ import scala.collection.JavaConversions;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;
-import java.util.List;
 
 public class AckActor extends AbstractActor {
 
@@ -19,7 +18,7 @@ public class AckActor extends AbstractActor {
                 .build();
     }
 
-    private Object mapAck(Udp.Received a) {
+    private Ack mapAck(Udp.Received a) {
         byte[] data = ArrayUtils.toPrimitive(JavaConversions.seqAsJavaList(a.data()).toArray(new Byte[0]));
         return new Ack(ByteBuffer.wrap(Arrays.copyOfRange(data, 2, data.length)).getShort());
     }

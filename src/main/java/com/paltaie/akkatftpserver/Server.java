@@ -2,6 +2,8 @@ package com.paltaie.akkatftpserver;
 
 import akka.actor.AbstractActor;
 import akka.actor.ActorRef;
+import akka.event.Logging;
+import akka.event.LoggingAdapter;
 import akka.io.Udp;
 import akka.io.UdpMessage;
 
@@ -10,6 +12,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Server extends AbstractActor {
+    private final LoggingAdapter log = Logging.getLogger(getContext().getSystem(), this);
+
     private Map<TftpOpcode, ActorRef> actorMap = new HashMap<>();
 
     public Server(ActorRef readRequestActor, ActorRef writeRequestActor, ActorRef errorActor, ActorRef ackActor) {
@@ -20,7 +24,7 @@ public class Server extends AbstractActor {
         // request creation of a bound listen socket
         final ActorRef mgr = Udp.get(getContext().getSystem()).getManager();
         mgr.tell(
-                UdpMessage.bind(getSelf(), new InetSocketAddress("localhost", 13337)),
+                UdpMessage.bind(getSelf(), new InetSocketAddress("0.0.0.0", 13337)),
                 getSelf());
     }
 
@@ -28,6 +32,7 @@ public class Server extends AbstractActor {
     public Receive createReceive() {
         return receiveBuilder()
                 .match(Udp.Bound.class, bound -> {
+                    log.info(bound.toString());
                     getContext().become(ready(getSender()));
                 })
                 .build();

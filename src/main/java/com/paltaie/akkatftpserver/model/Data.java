@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 
 @lombok.Data
 @AllArgsConstructor
-@Slf4j
 public class Data implements ByteArrayProvider {
     int blockNumber;
     byte[] data;
@@ -18,7 +17,6 @@ public class Data implements ByteArrayProvider {
         bytes[1] = (byte) TftpOpcode.DATA.getNumeric();
         bytes[2] = intToTwoBytes(blockNumber)[0];
         bytes[3] = intToTwoBytes(blockNumber)[1];
-        log.debug("block: {}; bytes[2]: {}; bytes[3]: {}", blockNumber, intToTwoBytes(blockNumber)[0], intToTwoBytes(blockNumber)[1]);
         System.arraycopy(data, 0, bytes, 4, data.length);
         return bytes;
     }
