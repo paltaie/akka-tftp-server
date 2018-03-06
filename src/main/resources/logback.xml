@@ -1,0 +1,12 @@
+<configuration>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>[%date{yyyy-MM-dd'T'HH:mm:sss.SSSZ}] [%+5level] [%logger{36}] [%X{akkaSource}] - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <root level="info">
+        <appender-ref ref="STDOUT" />
+    </root>
+</configuration>

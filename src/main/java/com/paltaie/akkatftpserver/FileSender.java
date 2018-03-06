@@ -27,7 +27,8 @@ public class FileSender extends AbstractActor {
     private final InetSocketAddress senderSocket;
     private List<byte[]> blocks;
     private int totalBlocks = 0;
-    private int lastAcked = 0;
+    private int currentBlockId = 1;
+    private int currentDataBlock = 0;
 
     public FileSender(InetSocketAddress senderSocket) {
         this.senderSocket = senderSocket;
@@ -61,7 +62,7 @@ public class FileSender extends AbstractActor {
                 totalBlocks++;
                 blocks.add(new byte[]{});
             }
-            sender().tell(UdpMessage.send(ByteString.fromArray(new Data(1, blocks.get(0)).getBytes()), senderSocket), self());
+            sendCurrentBlock();
             getContext().become(awaitingAck());
         } catch (FileNotFoundException e) {
             Error error = new Error(1, "File not found: " + readRequest.getFilename());
@@ -85,14 +86,25 @@ public class FileSender extends AbstractActor {
     }
 
     private void handleAck(Ack ack) {
-        lastAcked = ack.getBlockNumber();
-        log.debug("Received an ACK for block " + ack.getBlockNumber() + "/" + totalBlocks + " for consumer " + senderSocket);
-        if (lastAcked == totalBlocks) {
-            log.debug("All blocks sent and acked. Stopping self.");
-//            context().stop(self());
+        currentDataBlock++;
+        currentBlockId = ack.getBlockNumber();
+        if (currentBlockId == 65535) { //Roll over to 1 when we reach 0b111111111111111
+            currentBlockId = 1;
         } else {
-            ByteString response = ByteString.fromArray(new Data(lastAcked + 1, blocks.get(lastAcked)).getBytes());
-            sender().tell(UdpMessage.send(response, senderSocket), self());
+            currentBlockId++;
         }
+        log.debug("Received an ACK for block {}/{} for consumer{}", ack.getBlockNumber(), totalBlocks, senderSocket);
+        if (currentDataBlock == totalBlocks) {
+            log.debug("All blocks sent and acked. Stopping self.");
+            context().stop(self());
+        } else {
+            sendCurrentBlock();
+        }
+    }
+
+    private void sendCurrentBlock() {
+        log.debug("Sending block {}/{} (block ID: {}) to consumer {}", currentDataBlock + 1, totalBlocks, currentBlockId, senderSocket);
+        ByteString response = ByteString.fromArray(new Data(currentBlockId, blocks.get(currentDataBlock)).getBytes());
+        sender().tell(UdpMessage.send(response, senderSocket), self());
     }
 }
