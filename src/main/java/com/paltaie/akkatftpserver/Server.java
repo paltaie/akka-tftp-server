@@ -12,6 +12,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Server extends AbstractActor {
+    private static final String HOST = "0.0.0.0";
+    private static final int PORT = 13337;
+
     private final LoggingAdapter log = Logging.getLogger(getContext().getSystem(), this);
 
     private Map<TftpOpcode, ActorRef> actorMap = new HashMap<>();
@@ -24,7 +27,7 @@ public class Server extends AbstractActor {
         // request creation of a bound listen socket
         final ActorRef mgr = Udp.get(getContext().getSystem()).getManager();
         mgr.tell(
-                UdpMessage.bind(getSelf(), new InetSocketAddress("0.0.0.0", 13337)),
+                UdpMessage.bind(getSelf(), new InetSocketAddress(HOST, PORT)),
                 getSelf());
     }
 
