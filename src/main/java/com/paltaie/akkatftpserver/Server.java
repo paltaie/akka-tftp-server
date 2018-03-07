@@ -24,7 +24,6 @@ public class Server extends AbstractActor {
         actorMap.put(TftpOpcode.WRITE_REQUEST, writeRequestActor);
         actorMap.put(TftpOpcode.ERROR, errorActor);
         actorMap.put(TftpOpcode.ACK, ackActor);
-        // request creation of a bound listen socket
         final ActorRef mgr = Udp.get(getContext().getSystem()).getManager();
         mgr.tell(
                 UdpMessage.bind(getSelf(), new InetSocketAddress(HOST, PORT)),
@@ -47,12 +46,8 @@ public class Server extends AbstractActor {
                     TftpOpcode opcode = TftpOpcode.byOpcode(r.data().toArray()[1]);
                     actorMap.get(opcode).tell(r, socket);
                 })
-                .matchEquals(UdpMessage.unbind(), message -> {
-                    socket.tell(message, getSelf());
-                })
-                .match(Udp.Unbound.class, message -> {
-                    getContext().stop(getSelf());
-                })
+                .matchEquals(UdpMessage.unbind(), message -> socket.tell(message, getSelf()))
+                .match(Udp.Unbound.class, message -> getContext().stop(getSelf()))
                 .build();
     }
 }

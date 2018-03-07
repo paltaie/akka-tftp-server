@@ -39,7 +39,7 @@ public class SegmentSender extends AbstractActor {
     private void handleSend() {
         try {
             FileInputStream fileInputStream = new FileInputStream(new File(readRequest.getFilename()));
-            long skipped = fileInputStream.skip(previousBlockNumber * MAX_BLOCK_SIZE);
+            fileInputStream.skip(previousBlockNumber * MAX_BLOCK_SIZE);
             byte[] bytes = new byte[MAX_BLOCK_SIZE];
             int bytesRead = fileInputStream.read(bytes);
             if (bytesRead == -1) {
@@ -70,6 +70,6 @@ public class SegmentSender extends AbstractActor {
     @Override
     public Receive createReceive() {
         return receiveBuilder()
-                .matchEquals("SEND", a -> handleSend()).build();
+                .matchEquals("SEND", send -> handleSend()).build();
     }
 }
