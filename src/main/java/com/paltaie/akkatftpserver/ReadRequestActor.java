@@ -34,9 +34,8 @@ public class ReadRequestActor extends AbstractActor {
         String filename = new String(Arrays.copyOfRange(data, indexOf(data, ZERO_BYTE, 1),  indexOf(data, ZERO_BYTE, 2)), StandardCharsets.UTF_8).trim();
         String mode = new String(Arrays.copyOfRange(data, indexOf(data, ZERO_BYTE, 2) + 1,  indexOf(data, ZERO_BYTE, 3)), StandardCharsets.UTF_8);
         ReadRequest readRequest = new ReadRequest(TftpOpcode.READ_REQUEST, filename, mode);
-        ActorRef fileSender = context().actorOf(Props.create(FileSender.class, r.sender()));
-        context().watch(fileSender);
-        fileSender.tell(readRequest, sender());
+        ClientMap.map2.put(r.sender(), readRequest);
+        context().actorOf(Props.create(SegmentSender.class, r.sender(), readRequest, 0)).tell("SEND", sender());
     }
 
     private int indexOf(byte[] bytes, byte target, int occurrence) {
