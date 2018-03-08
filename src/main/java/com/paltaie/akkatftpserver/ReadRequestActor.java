@@ -23,7 +23,7 @@ import java.util.Arrays;
 public class ReadRequestActor extends AbstractActor {
 
     private static final Byte ZERO_BYTE = Byte.valueOf("0");
-    public static final Key<LWWMap<InetSocketAddress, ReadRequest>> MAP_KEY = LWWMapKey.create("key");
+    static final Key<LWWMap<InetSocketAddress, ReadRequest>> MAP_KEY = LWWMapKey.create("key");
 
     private final LoggingAdapter log = Logging.getLogger(getContext().getSystem(), this);
     private final Cluster cluster = Cluster.get(context().system());
@@ -47,6 +47,7 @@ public class ReadRequestActor extends AbstractActor {
         String filename = new String(Arrays.copyOfRange(data, indexOf(data, ZERO_BYTE, 1),  indexOf(data, ZERO_BYTE, 2)), StandardCharsets.UTF_8).trim();
         String mode = new String(Arrays.copyOfRange(data, indexOf(data, ZERO_BYTE, 2) + 1,  indexOf(data, ZERO_BYTE, 3)), StandardCharsets.UTF_8);
         ReadRequest readRequest = new ReadRequest(TftpOpcode.READ_REQUEST, filename, mode);
+        log.info("Storing requester {} with RRQ {} in CRDT store", r.sender(), readRequest);
         Replicator.Update<LWWMap<InetSocketAddress, ReadRequest>> update = new Replicator.Update<>(MAP_KEY, LWWMap.create(), Replicator.writeLocal(), map -> map.put(cluster, r.sender(), readRequest));
         replicator.tell(update, self());
         context().actorOf(Props.create(SegmentSender.class, r.sender(), readRequest, 0)).tell("SEND", sender());
