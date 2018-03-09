@@ -11,9 +11,7 @@ import akka.event.LoggingAdapter;
 import akka.io.Udp;
 import com.paltaie.akkatftpserver.model.Ack;
 import com.paltaie.akkatftpserver.model.ReadRequest;
-import org.apache.commons.lang.ArrayUtils;
 import scala.Option;
-import scala.collection.JavaConversions;
 import scala.concurrent.duration.Duration;
 
 import java.net.InetSocketAddress;
@@ -55,7 +53,7 @@ public class AckActor extends AbstractActor {
     }
 
     private Ack mapAck(Udp.Received a) {
-        byte[] data = ArrayUtils.toPrimitive(JavaConversions.seqAsJavaList(a.data()).toArray(new Byte[0]));
+        byte[] data = TftpUtils.receivedToByteArray(a);
         return new Ack(ByteBuffer.wrap(Arrays.copyOfRange(data, 2, data.length)).getShort());
     }
 }

@@ -13,8 +13,6 @@ import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import akka.io.Udp;
 import com.paltaie.akkatftpserver.model.ReadRequest;
-import org.apache.commons.lang.ArrayUtils;
-import scala.collection.JavaConversions;
 
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
@@ -43,7 +41,7 @@ public class ReadRequestActor extends AbstractActor {
     }
 
     private void handleReceived(Udp.Received r) {
-        byte[] data = ArrayUtils.toPrimitive(JavaConversions.seqAsJavaList(r.data()).toArray(new Byte[0]));
+        byte[] data = TftpUtils.receivedToByteArray(r);
         String filename = new String(Arrays.copyOfRange(data, indexOf(data, ZERO_BYTE, 1),  indexOf(data, ZERO_BYTE, 2)), StandardCharsets.UTF_8).trim();
         String mode = new String(Arrays.copyOfRange(data, indexOf(data, ZERO_BYTE, 2) + 1,  indexOf(data, ZERO_BYTE, 3)), StandardCharsets.UTF_8);
         ReadRequest readRequest = new ReadRequest(TftpOpcode.READ_REQUEST, filename, mode);
