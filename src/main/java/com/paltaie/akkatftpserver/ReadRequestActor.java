@@ -21,7 +21,7 @@ import java.util.Arrays;
 public class ReadRequestActor extends AbstractActor {
 
     private static final Byte ZERO_BYTE = Byte.valueOf("0");
-    static final Key<LWWMap<InetSocketAddress, ReadRequest>> MAP_KEY = LWWMapKey.create("key");
+    static final Key<LWWMap<InetSocketAddress, ReadRequest>> MAP_KEY = LWWMapKey.create("tftpRequesterMap");
 
     private final LoggingAdapter log = Logging.getLogger(getContext().getSystem(), this);
     private final Cluster cluster = Cluster.get(context().system());

@@ -22,7 +22,6 @@ public class Runner {
                             system.actorOf(Props.create(ErrorActor.class),"errorActor"),
                             system.actorOf(Props.create(AckActor.class),"ackActor")), PoisonPill.getInstance(),
                         clusterSingletonManagerSettings
-                )
-        );
+                ), "serverSingleton");
     }
 }
