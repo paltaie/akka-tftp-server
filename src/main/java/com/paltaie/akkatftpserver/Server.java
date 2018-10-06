@@ -34,7 +34,7 @@ public class Server extends AbstractActor {
     public Receive createReceive() {
         return receiveBuilder()
                 .match(Udp.Bound.class, bound -> {
-                    log.info(bound.toString());
+                    log.info("I'm the cluster singleton! " + bound.toString());
                     getContext().become(ready(getSender()));
                 })
                 .build();
