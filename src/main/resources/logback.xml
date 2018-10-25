@@ -6,6 +6,8 @@
     </appender>
 
     <logger name="com.paltaie" level="DEBUG"/>
+    <logger name="akka.cluster" level="DEBUG"/>
+    <logger name="akka.cluster.ddata.Replicator" level="WARN"/>
 
     <root level="WARN">
         <appender-ref ref="STDOUT"/>
