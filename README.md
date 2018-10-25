@@ -1,4 +1,4 @@
-#`akka-tftp-server`
+# `akka-tftp-server`
 
 ## Background
 This is an Akka implementation of a TFTP server as specified by [RFC 1350](https://tools.ietf.org/html/rfc1350), initially
