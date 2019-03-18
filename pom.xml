@@ -14,6 +14,21 @@
 
     <dependencies>
         <dependency>
+            <groupId>com.lightbend.akka.management</groupId>
+            <artifactId>akka-management-cluster-bootstrap_2.12</artifactId>
+            <version>0.20.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.lightbend.akka.discovery</groupId>
+            <artifactId>akka-discovery-config_2.12</artifactId>
+            <version>0.20.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.lightbend.akka.management</groupId>
+            <artifactId>akka-management-cluster-http_2.12</artifactId>
+            <version>0.20.0</version>
+        </dependency>
+        <dependency>
             <groupId>com.typesafe.akka</groupId>
             <artifactId>akka-actor_2.12</artifactId>
             <version>${akka.version}</version>

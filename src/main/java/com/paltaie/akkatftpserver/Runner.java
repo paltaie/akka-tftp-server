@@ -5,6 +5,8 @@ import akka.actor.PoisonPill;
 import akka.actor.Props;
 import akka.cluster.singleton.ClusterSingletonManager;
 import akka.cluster.singleton.ClusterSingletonManagerSettings;
+import akka.management.AkkaManagement;
+import akka.management.cluster.bootstrap.ClusterBootstrap;
 import com.paltaie.akkatftpserver.model.ErrorActor;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
@@ -17,6 +19,8 @@ public class Runner {
     public static void main(String[] args) {
         Config config = ConfigFactory.load("application");
         ActorSystem system = ActorSystem.create(config.getString("actor-system-name"));
+        AkkaManagement.get(system).start();
+        ClusterBootstrap.get(system).start();
         ClusterSingletonManagerSettings clusterSingletonManagerSettings = ClusterSingletonManagerSettings.create(system);
         system.actorOf(
                 ClusterSingletonManager.props(
