@@ -19,11 +19,14 @@ public class Server extends AbstractActor {
 
     private Map<TftpOpcode, ActorRef> actorMap = new HashMap<>();
 
-    public Server(ActorRef readRequestActor, ActorRef writeRequestActor, ActorRef errorActor, ActorRef ackActor) {
+    public Server(ActorRef readRequestActor, ActorRef writeRequestActor, ActorRef errorActor, ActorRef ackActor,
+                  ActorRef dataActor) {
         actorMap.put(TftpOpcode.READ_REQUEST, readRequestActor);
         actorMap.put(TftpOpcode.WRITE_REQUEST, writeRequestActor);
         actorMap.put(TftpOpcode.ERROR, errorActor);
         actorMap.put(TftpOpcode.ACK, ackActor);
+        actorMap.put(TftpOpcode.DATA, dataActor);
+        
         final ActorRef mgr = Udp.get(getContext().getSystem()).getManager();
         mgr.tell(
                 UdpMessage.bind(getSelf(), new InetSocketAddress(HOST, PORT)),
@@ -44,6 +47,7 @@ public class Server extends AbstractActor {
         return receiveBuilder()
                 .match(Udp.Received.class, r -> {
                     TftpOpcode opcode = TftpOpcode.byOpcode(r.data().toArray()[1]);
+                    log.info("Received opcode: {}", opcode);
                     actorMap.get(opcode).tell(r, socket);
                 })
                 .matchEquals(UdpMessage.unbind(), message -> socket.tell(message, getSelf()))
