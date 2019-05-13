@@ -24,7 +24,9 @@ public class Runner {
                             system.actorOf(Props.create(ReadRequestActor.class),"readRequestActor"),
                             system.actorOf(Props.create(WriteRequestActor.class),"writeRequestActor"),
                             system.actorOf(Props.create(ErrorActor.class),"errorActor"),
-                            system.actorOf(Props.create(AckActor.class),"ackActor")), PoisonPill.getInstance(),
+                            system.actorOf(Props.create(AckActor.class),"ackActor"),
+                            system.actorOf(Props.create(DataActor.class), "dataActor")),
+                        PoisonPill.getInstance(),
                         clusterSingletonManagerSettings
                 ), "serverSingleton");
         LOG.info("Welcome to akka-tftp-server " + Runner.class.getPackage().getImplementationVersion() + "!");

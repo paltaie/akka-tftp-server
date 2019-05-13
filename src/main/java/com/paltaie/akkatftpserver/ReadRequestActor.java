@@ -20,7 +20,6 @@ import java.util.Arrays;
 
 public class ReadRequestActor extends AbstractActor {
 
-    private static final Byte ZERO_BYTE = Byte.valueOf("0");
     static final Key<LWWMap<InetSocketAddress, ReadRequest>> MAP_KEY = LWWMapKey.create("tftpRequesterMap");
 
     private final LoggingAdapter log = Logging.getLogger(getContext().getSystem(), this);
@@ -41,26 +40,15 @@ public class ReadRequestActor extends AbstractActor {
     }
 
     private void handleReceived(Udp.Received r) {
-        byte[] data = TftpUtils.receivedToByteArray(r);
-        String filename = new String(Arrays.copyOfRange(data, indexOf(data, ZERO_BYTE, 1),  indexOf(data, ZERO_BYTE, 2)), StandardCharsets.UTF_8).trim();
-        String mode = new String(Arrays.copyOfRange(data, indexOf(data, ZERO_BYTE, 2) + 1,  indexOf(data, ZERO_BYTE, 3)), StandardCharsets.UTF_8);
+        String filename = TftpUtils.getFileName(r);
+        String mode = TftpUtils.getMode(r);
         ReadRequest readRequest = new ReadRequest(TftpOpcode.READ_REQUEST, filename, mode);
+
         log.info("Storing requester {} with RRQ {} in CRDT store", r.sender(), readRequest);
         Replicator.Update<LWWMap<InetSocketAddress, ReadRequest>> update = new Replicator.Update<>(MAP_KEY, LWWMap.create(), Replicator.writeLocal(), map -> map.put(cluster, r.sender(), readRequest));
         replicator.tell(update, self());
-        context().actorOf(Props.create(SegmentSender.class, r.sender(), readRequest, 0)).tell("SEND", sender());
-    }
+        log.info("Replicator updated.");
 
-    private int indexOf(byte[] bytes, byte target, int occurrence) {
-        int count = 0;
-        for (int i = 0; i < bytes.length; i++) {
-            if (bytes[i] == target) {
-                count++;
-                if (occurrence == count) {
-                    return i;
-                }
-            }
-        }
-        return -1;
+        context().actorOf(Props.create(SegmentSender.class, r.sender(), readRequest, 0)).tell("SEND", sender());
     }
 }

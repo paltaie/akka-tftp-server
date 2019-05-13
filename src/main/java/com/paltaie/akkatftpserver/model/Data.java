@@ -2,7 +2,6 @@ package com.paltaie.akkatftpserver.model;
 
 import com.paltaie.akkatftpserver.TftpOpcode;
 import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 @lombok.Data
 @AllArgsConstructor
@@ -21,10 +20,4 @@ public class Data implements ByteArrayProvider {
         return bytes;
     }
 
-    private static byte[] intToTwoBytes(int value) {
-        return new byte[] {
-            (byte)((value >> 8) & 0xFF),
-            (byte)(value & 0xFF)
-        };
-    }
 }
